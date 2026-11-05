@@ -1,122 +1,218 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState, useMemo } from 'react';
+import { Sidebar } from './components/Sidebar';
+import { TopNav } from './components/TopNav';
+import { Toolbar } from './components/Toolbar';
+import { LeadsTable } from './components/LeadsTable';
+import { Pagination } from './components/Pagination';
+import { INITIAL_LEADS } from './data/mockLeads';
+import type { Lead, SortField, SortOrder, ColumnVisibility } from './types';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export function App() {
+  const [activeSidebarItem, setActiveSidebarItem] = useState('All Leads');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStageFilter, setSelectedStageFilter] = useState('All');
+  const [sortField, setSortField] = useState<SortField>('created');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
+    checkbox: true,
+    name: true,
+    leadOwner: true,
+    email: true,
+    phone: true,
+    stage: true,
+    leadSource: true,
+    created: true,
+  });
+
+  // Filter leads by search query and stage
+  const filteredLeads = useMemo(() => {
+    return INITIAL_LEADS.filter((lead) => {
+      // Stage filter
+      if (selectedStageFilter !== 'All' && lead.stage !== selectedStageFilter) {
+        return false;
+      }
+
+      // Search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase().trim();
+        const matchesName = lead.name.toLowerCase().includes(query);
+        const matchesEmail = lead.email.toLowerCase().includes(query);
+        const matchesPhone = lead.phone.toLowerCase().includes(query);
+        const matchesStage = lead.stage.toLowerCase().includes(query);
+        const matchesSource = lead.leadSource.toLowerCase().includes(query);
+        const matchesOwner = lead.leadOwner.toLowerCase().includes(query);
+
+        return (
+          matchesName ||
+          matchesEmail ||
+          matchesPhone ||
+          matchesStage ||
+          matchesSource ||
+          matchesOwner
+        );
+      }
+
+      return true;
+    });
+  }, [searchQuery, selectedStageFilter]);
+
+  // Sort leads
+  const sortedLeads = useMemo(() => {
+    const list = [...filteredLeads];
+
+    list.sort((a: Lead, b: Lead) => {
+      let comparison = 0;
+      if (sortField === 'name') {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortField === 'leadOwner') {
+        comparison = a.leadOwner.localeCompare(b.leadOwner);
+      } else if (sortField === 'stage') {
+        comparison = a.stage.localeCompare(b.stage);
+      } else if (sortField === 'created') {
+        comparison = a.timestamp - b.timestamp;
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return list;
+  }, [filteredLeads, sortField, sortOrder]);
+
+  // Pagination slicing
+  const paginatedLeads = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return sortedLeads.slice(startIndex, startIndex + pageSize);
+  }, [sortedLeads, currentPage, pageSize]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedLeads.length / pageSize));
+
+  // Toggle single row selection
+  const handleToggleRow = (id: string) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // Toggle select all
+  const handleToggleSelectAll = () => {
+    if (selectedRowIds.size === paginatedLeads.length) {
+      setSelectedRowIds(new Set());
+    } else {
+      setSelectedRowIds(new Set(paginatedLeads.map((l) => l.id)));
+    }
+  };
+
+  // Handle column sort
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  // Reset/Refresh data
+  const handleRefresh = () => {
+    setSearchQuery('');
+    setSelectedStageFilter('All');
+    setSortField('created');
+    setSortOrder('desc');
+    setSelectedRowIds(new Set());
+    setCurrentPage(1);
+    setColumnVisibility({
+      checkbox: true,
+      name: true,
+      leadOwner: true,
+      email: true,
+      phone: true,
+      stage: true,
+      leadSource: true,
+      created: true,
+    });
+  };
+
+  // Toggle column visibility
+  const handleToggleColumn = (col: keyof ColumnVisibility) => {
+    setColumnVisibility((prev) => ({
+      ...prev,
+      [col]: !prev[col],
+    }));
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app-container">
+      {/* 1. Left Sidebar */}
+      <Sidebar
+        activeItem={activeSidebarItem}
+        onSelectItem={(item) => setActiveSidebarItem(item)}
+      />
 
-      <div className="ticks"></div>
+      {/* 2. Main Content Layout */}
+      <div className="main-content-layout">
+        {/* Top Navigation */}
+        <TopNav totalCount={sortedLeads.length} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* Dashboard Main Area with Card */}
+        <main className="dashboard-main-area">
+          <div className="dashboard-card">
+            {/* Table Toolbar */}
+            <Toolbar
+              searchQuery={searchQuery}
+              onSearchChange={(q) => {
+                setSearchQuery(q);
+                setCurrentPage(1);
+              }}
+              selectedStageFilter={selectedStageFilter}
+              onStageFilterChange={(stage) => {
+                setSelectedStageFilter(stage);
+                setCurrentPage(1);
+              }}
+              columnVisibility={columnVisibility}
+              onToggleColumn={handleToggleColumn}
+              onRefresh={handleRefresh}
+            />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            {/* Leads Table */}
+            <LeadsTable
+              leads={paginatedLeads}
+              selectedRowIds={selectedRowIds}
+              onToggleRow={handleToggleRow}
+              onToggleSelectAll={handleToggleSelectAll}
+              sortField={sortField}
+              sortOrder={sortOrder}
+              onSort={handleSort}
+              columnVisibility={columnVisibility}
+            />
+
+            {/* Bottom Pagination */}
+            <Pagination
+              totalCount={sortedLeads.length}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              onPageChange={(page) => setCurrentPage(page)}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
