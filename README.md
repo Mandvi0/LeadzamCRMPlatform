@@ -1,45 +1,104 @@
 
 # LeadZam – UX Audit & Frontend Redesign
 
-A UX audit and frontend redesign of LeadZam, a CRM platform designed to help businesses manage leads, track campaign performance, and organize sales follow-ups.
+A UI/UX audit and frontend redesign of LeadZam, a CRM platform designed to help businesses manage leads, track campaign performance, and organize sales follow-ups.
 
 This project focuses on identifying usability issues in the existing platform and developing a more intuitive experience through UX improvements and a functional React frontend.
 
-## Project Overview
+## 📌 About the Project
 
-- **Project:** LeadZam
-- **Role:** UI/UX Designer & Frontend Developer
-- **Project Type:** UX Audit & Frontend Redesign
-- **Platform:** Web Application
-- **Status:** Completed
+LeadZam is a CRM platform that helps businesses manage leads generated through marketing campaigns, monitor lead performance, and organize sales follow-up activities.
 
-## Project Objectives
+The objective of this assignment was to explore the existing platform from a user's perspective, identify usability challenges, and propose practical improvements to enhance the overall user experience.
 
-- Evaluate the existing platform from a user's perspective.
+Rather than focusing only on visual redesign, the project emphasizes solving interaction-level problems and improving important user workflows.
+
+## 🎯 Project Objectives
+
+- Understand the platform's purpose and core functionality.
+- Evaluate the existing user experience.
 - Identify usability issues and interaction challenges.
-- Analyze important workflows and potential friction points.
-- Prioritize UX problems based on their impact on users.
-- Develop improved interface solutions.
-- Implement a functional and responsive frontend.
+- Prioritize problems based on their impact on users.
+- Redesign an important user journey.
+- Build a functional frontend prototype using React and TypeScript.
+- Improve interaction clarity, consistency, and usability.
 
-## UX Audit Process
+## 🔍 UX Audit & Key Findings
 
-### 1. Website Exploration
-Explored the existing LeadZam website and its features to understand the platform, navigation, and user workflows.
+During the website exploration and UX evaluation, I identified several areas where the user experience could be improved.
 
-### 2. UX Evaluation
-Identified usability issues, confusing interactions, unnecessary steps, and areas that could create friction in the user journey.
+### 1. Follow-up Scheduling Requires a Lead Owner
 
-### 3. Problem Identification
-Analyzed the experience and documented key usability concerns, focusing on interaction clarity, workflow efficiency, and user control.
+**Problem:** Users cannot schedule a follow-up when a lead has no assigned owner.
 
-### 4. Design Improvements
-Developed solutions to improve information hierarchy, interaction patterns, visual consistency, and overall usability.
+**User Impact:** This interrupts the user's workflow and introduces an additional step before completing the intended action.
 
-### 5. Frontend Development
-Translated the proposed improvements into a functional React-based frontend.
+**Proposed Improvement:** Allow users to assign an owner as part of the follow-up scheduling process.
 
-## Tech Stack
+### 2. Lead Assignment Opens a Separate Dialog
+
+**Problem:** Selecting the Assign Lead option opens a separate Manage Lead dialog, taking users away from the follow-up scheduling process.
+
+**User Impact:** Switching between different interaction contexts increases cognitive effort and makes the workflow feel disconnected.
+
+**Proposed Improvement:** Integrate owner selection into the follow-up scheduling experience.
+
+### 3. Users Need to Restart the Follow-up Action
+
+**Problem:** After assigning an owner, users need to return and initiate the follow-up action again.
+
+**User Impact:** The original task is interrupted, creating unnecessary additional interactions.
+
+**Proposed Improvement:** Preserve the user's original intent and continue directly to follow-up scheduling after assigning an owner.
+
+## 💡 Proposed UX Solution
+
+The redesign focuses on making lead assignment and follow-up scheduling a more connected and intuitive experience.
+
+### Existing Workflow
+
+1. Open a lead profile.
+2. Select the Follow-up option.
+3. Receive a message that the lead needs an owner.
+4. Select Assign Lead.
+5. A separate Manage Lead dialog opens.
+6. Assign the lead to a team member.
+7. Return to the lead profile.
+8. Initiate follow-up scheduling again.
+
+### Proposed Workflow
+
+1. Open a lead profile.
+2. Select Follow-up.
+3. Check whether the lead has an assigned owner.
+4. If no owner exists, select a team member within the scheduling experience.
+5. Choose a follow-up date and time.
+6. Add an optional note.
+7. Confirm the follow-up.
+8. Receive clear confirmation of the completed action.
+
+### Design Goals
+
+- Reduce unnecessary navigation.
+- Preserve user intent.
+- Simplify lead assignment.
+- Improve interaction clarity.
+- Reduce cognitive load.
+- Provide meaningful feedback after actions.
+
+## ✨ Key Features
+
+The frontend prototype focuses on demonstrating the redesigned experience.
+
+- Lead assignment interaction.
+- Follow-up scheduling workflow.
+- Team member selection.
+- Form interactions and input handling.
+- Clear information hierarchy.
+- Consistent UI components.
+- Responsive interface considerations.
+
+## 🛠️ Tech Stack
 
 - React.js
 - TypeScript
@@ -50,22 +109,23 @@ Translated the proposed improvements into a functional React-based frontend.
 - Git & GitHub
 - Figma
 
-## Key Focus Areas
+## 🎨 Design & Development Approach
 
-- Improved navigation and information hierarchy.
-- Clearer interaction patterns and user feedback.
-- Reduced unnecessary workflow friction.
-- Consistent visual design and UI components.
-- Responsive interface layouts.
-- Better usability across important user journeys.
+The project followed a structured approach:
 
-## AI Tools & Usage Disclosure
+1. **Product Exploration:** Understanding the existing platform and its functionality.
+2. **UX Evaluation:** Exploring user interactions and identifying usability challenges.
+3. **Problem Prioritization:** Focusing on issues that interrupt important user workflows.
+4. **Solution Design:** Developing improved interaction patterns and user flows.
+5. **Frontend Development:** Implementing the redesigned experience using React and TypeScript.
+
+## 🤖 AI Tools & Usage Disclosure
 
 AI tools were used as supporting resources during exploration and development.
 
 **ChatGPT**
 - Explored technical approaches and implementation possibilities.
-- Helped clarify technical concepts.
+- Clarified development concepts.
 - Assisted with specific coding questions and documentation.
 
 **Cursor**
@@ -74,19 +134,40 @@ AI tools were used as supporting resources during exploration and development.
 
 **My Contribution**
 
-The website exploration, UX audit, identification of usability issues, prioritization of problems, design decisions, and overall problem-solving approach were independently carried out by me.
+The website exploration, UX audit, identification of usability issues, prioritization, problem-solving approach, and design decisions were independently carried out by me.
 
-AI tools were used for assistance where needed, while the final design decisions and implementation direction remained my responsibility.
+AI tools were used for assistance where needed, while the final design direction and implementation decisions remained my responsibility.
 
-## Key Learnings
+## 📋 Project Scope & Limitations
 
-- Evaluating a real-world digital product from a user's perspective.
-- Identifying usability issues beyond visual inconsistencies.
-- Translating UX observations into practical improvements.
-- Understanding the relationship between design decisions and frontend implementation.
-- Building a functional interface using React and TypeScript.
+**Included:**
+- UX audit and usability evaluation.
+- Lead assignment and follow-up scheduling redesign.
+- Frontend interface development.
+- Interaction states and responsive layout considerations.
 
-## Getting Started
+**Not Included:**
+- Complete CRM platform redesign.
+- Backend and database integration.
+- Real lead management operations.
+- Actual email or WhatsApp notifications.
+- Production-level CRM functionality.
+
+This project is a frontend prototype demonstrating the proposed UX improvements.
+
+## 🧪 Validation & Testing
+
+The prototype is intended to be evaluated against the following usability criteria:
+
+- Is lead assignment easy to understand?
+- Can users schedule follow-ups without unnecessary navigation?
+- Are required actions and fields clearly communicated?
+- Does the interface provide clear feedback?
+- Is the experience usable across different screen sizes?
+
+Further usability testing with representative users would be required before production release.
+
+## 🚀 Getting Started
 
 Follow these steps to run the project locally.
 
@@ -94,6 +175,7 @@ Follow these steps to run the project locally.
 
 - Node.js
 - npm
+- Git
 
 ### Installation
 
@@ -103,7 +185,7 @@ Follow these steps to run the project locally.
 git clone YOUR_GITHUB_REPOSITORY_URL
 ```
 
-**2. Navigate to the project folder**
+**2. Navigate to the project directory**
 
 ```bash
 cd YOUR_PROJECT_FOLDER
@@ -121,14 +203,48 @@ npm install
 npm run dev
 ```
 
-The application will be available at the local URL displayed in your terminal.
+**5. Open the application**
 
-## Project Links
+Open the local URL displayed in your terminal, usually:
 
-- **Live Demo:** Add your deployment link here.
-- **GitHub Repository:** Add your repository link here.
-- **Figma Design:** Add your Figma link here, if available.
+http://localhost:5173
+
+### Additional Commands
+
+**Build the project**
+
+```bash
+npm run build
+```
+
+**Run ESLint**
+
+```bash
+npm run lint
+```
+
+**Preview production build**
+
+```bash
+npm run preview
+```
+
+## 🔗 Project Links
+
+- **GitHub Repository:** YOUR_GITHUB_REPOSITORY_URL
+- **Live Demo:** YOUR_DEPLOYED_PROJECT_URL
+- **Figma Design:** YOUR_FIGMA_LINK
+
+## 📚 Key Learnings
+
+- Evaluating an existing product from a user's perspective.
+- Identifying usability issues beyond visual inconsistencies.
+- Understanding how interaction problems affect user workflows.
+- Translating UX observations into practical solutions.
+- Combining UX thinking with frontend implementation.
 
 ---
 
-**Designed and developed as a UX audit and frontend redesign project, demonstrating independent UX thinking, problem-solving, and React development skills.**
+**Project:** LeadZam – UX Audit & Frontend Redesign  
+**Role:** UI/UX Designer & Frontend Developer  
+**Built with:** React, TypeScript & Vite
