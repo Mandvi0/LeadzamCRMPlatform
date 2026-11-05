@@ -229,11 +229,12 @@ npm run lint
 npm run preview
 ```
 
+
 ## 🔗 Project Links
 
-- **GitHub Repository:** YOUR_GITHUB_REPOSITORY_URL
-- **Live Demo:** YOUR_DEPLOYED_PROJECT_URL
-- **Figma Design:** YOUR_FIGMA_LINK
+- **GitHub Repository:** [Leadzam CRM Platform](https://github.com/Mandvi0/LeadzamCRMPlatform)
+- **Live Demo (Vercel):** [View Live Project](https://leadzam-crm-platform.vercel.app/)
+- **Figma Design & Deliverables:** [View Figma File](https://www.figma.com/design/L2xW3SyG60PoDYkQoBoc5G/DELIVERABLES?node-id=0-1&t=r2qSKCmV9THyt1kN-1)
 
 ## 📚 Key Learnings
 
