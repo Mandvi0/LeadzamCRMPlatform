@@ -18,6 +18,7 @@ interface LeadDetailsDrawerProps {
   onStageChange: (stage: StageType) => void;
   onOwnerChange: (owner: TeamMember) => void;
   onRefresh: () => void;
+  onOpenFollowUp?: () => void;
 }
 
 export const LeadDetailsDrawer: React.FC<LeadDetailsDrawerProps> = ({
@@ -31,6 +32,7 @@ export const LeadDetailsDrawer: React.FC<LeadDetailsDrawerProps> = ({
   onStageChange,
   onOwnerChange,
   onRefresh,
+  onOpenFollowUp,
 }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +87,7 @@ export const LeadDetailsDrawer: React.FC<LeadDetailsDrawerProps> = ({
           onStageChange={onStageChange}
           onOwnerChange={onOwnerChange}
           onRefresh={onRefresh}
+          onOpenFollowUp={onOpenFollowUp}
         />
 
         {/* Scrollable Drawer Body */}
@@ -96,7 +99,7 @@ export const LeadDetailsDrawer: React.FC<LeadDetailsDrawerProps> = ({
           <LocationSection lead={lead} />
 
           {/* Quick Action Buttons (Call, WhatsApp, Note, To-Do, Follow-up) */}
-          <QuickActions lead={lead} />
+          <QuickActions lead={lead} onOpenFollowUp={onOpenFollowUp} />
 
           {/* Activity Section with Tabs & Filters */}
           <ActivitySection lead={lead} />

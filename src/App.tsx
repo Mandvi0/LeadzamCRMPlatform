@@ -5,6 +5,8 @@ import { Toolbar } from './components/Toolbar';
 import { LeadsTable } from './components/LeadsTable';
 import { Pagination } from './components/Pagination';
 import { LeadDetailsDrawer } from './components/LeadDetailsDrawer/LeadDetailsDrawer';
+import { ScheduleFollowUpModal } from './components/ScheduleFollowUpModal/ScheduleFollowUpModal';
+import type { FollowUpRep } from './components/ScheduleFollowUpModal/ScheduleFollowUpModal';
 import { INITIAL_LEADS } from './data/mockLeads';
 import type { Lead, SortField, SortOrder, ColumnVisibility, StageType, TeamMember } from './types';
 import './App.css';
@@ -26,7 +28,10 @@ export function App() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Check URL query parameter for automated verification
+  // Follow-up scheduling modal state
+  const [isFollowUpOpen, setIsFollowUpOpen] = useState(false);
+
+  // Check URL query parameters for automated verification
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const leadParam = params.get('lead');
@@ -38,6 +43,9 @@ export function App() {
         setSelectedLead(found);
         setIsDrawerOpen(true);
       }
+    }
+    if (params.get('followup') === 'true') {
+      setIsFollowUpOpen(true);
     }
   }, []);
 
@@ -123,6 +131,49 @@ export function App() {
   // Close drawer
   const closeLeadDetails = () => {
     setIsDrawerOpen(false);
+    setIsFollowUpOpen(false);
+  };
+
+  // Follow-up modal handlers
+  const handleOpenFollowUp = () => {
+    setIsFollowUpOpen(true);
+  };
+
+  const handleCloseFollowUp = () => {
+    setIsFollowUpOpen(false);
+  };
+
+  const handleScheduleFollowUp = (details: {
+    rep: FollowUpRep;
+    date: string;
+    time: string;
+    note: string;
+    sendReminder: boolean;
+  }) => {
+    if (!selectedLead) return;
+
+    const newActivity = {
+      id: `act-${Date.now()}`,
+      type: 'task' as const,
+      title: `Follow-up scheduled with ${details.rep.name}`,
+      description: details.note
+        ? `"${details.note}" (${details.date} at ${details.time})`
+        : `Scheduled for ${details.date} at ${details.time}. Notification enabled: ${details.sendReminder ? 'Yes' : 'No'}.`,
+      timestamp: 'Just now',
+      user: details.rep.name,
+    };
+
+    const updatedLead: Lead = {
+      ...selectedLead,
+      lastActivity: 'Just now',
+      activities: [newActivity, ...(selectedLead.activities || [])],
+    };
+
+    setSelectedLead(updatedLead);
+    setLeadsData((prev) =>
+      prev.map((l) => (l.id === updatedLead.id ? updatedLead : l))
+    );
+    setIsFollowUpOpen(false);
   };
 
   // Previous and Next lead navigation inside drawer
@@ -337,6 +388,15 @@ export function App() {
         onStageChange={handleStageChange}
         onOwnerChange={handleOwnerChange}
         onRefresh={handleRefresh}
+        onOpenFollowUp={handleOpenFollowUp}
+      />
+
+      {/* 4. Schedule Follow-up Modal */}
+      <ScheduleFollowUpModal
+        isOpen={isFollowUpOpen}
+        lead={selectedLead}
+        onClose={handleCloseFollowUp}
+        onSchedule={handleScheduleFollowUp}
       />
     </div>
   );

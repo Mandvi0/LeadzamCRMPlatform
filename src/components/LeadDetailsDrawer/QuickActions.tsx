@@ -4,9 +4,10 @@ import type { Lead } from '../../types';
 
 interface QuickActionsProps {
   lead: Lead;
+  onOpenFollowUp?: () => void;
 }
 
-export const QuickActions: React.FC<QuickActionsProps> = ({ lead }) => {
+export const QuickActions: React.FC<QuickActionsProps> = ({ lead, onOpenFollowUp }) => {
   return (
     <div className="quick-actions-bar">
       {/* 1. Call */}
@@ -69,7 +70,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ lead }) => {
       <button
         type="button"
         className="quick-action-btn"
-        onClick={() => alert(`Schedule follow-up for ${lead.name}`)}
+        onClick={onOpenFollowUp}
         title="Follow-up"
       >
         <Calendar size={15} strokeWidth={2} color="#0875F5" />

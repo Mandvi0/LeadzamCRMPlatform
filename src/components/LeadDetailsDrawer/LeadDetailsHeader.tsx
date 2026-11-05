@@ -24,6 +24,7 @@ interface LeadDetailsHeaderProps {
   onStageChange: (stage: StageType) => void;
   onOwnerChange: (owner: TeamMember) => void;
   onRefresh: () => void;
+  onOpenFollowUp?: () => void;
 }
 
 const STAGE_OPTIONS: StageType[] = [
@@ -46,6 +47,7 @@ export const LeadDetailsHeader: React.FC<LeadDetailsHeaderProps> = ({
   onStageChange,
   onOwnerChange,
   onRefresh,
+  onOpenFollowUp,
 }) => {
   const [isStageOpen, setIsStageOpen] = useState(false);
   const [isOwnerOpen, setIsOwnerOpen] = useState(false);
@@ -202,7 +204,7 @@ export const LeadDetailsHeader: React.FC<LeadDetailsHeaderProps> = ({
             <button
               type="button"
               className="drawer-followup-pill-btn"
-              onClick={() => alert('Schedule follow-up')}
+              onClick={onOpenFollowUp}
               title="Add follow-up"
             >
               <Plus size={12} strokeWidth={2.4} color="#374151" />
