@@ -20,6 +20,7 @@ interface LeadsTableProps {
   sortOrder: SortOrder;
   onSort: (field: SortField) => void;
   columnVisibility: ColumnVisibility;
+  onSelectLead: (lead: Lead) => void;
 }
 
 export const LeadsTable: React.FC<LeadsTableProps> = ({
@@ -31,6 +32,7 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({
   sortOrder,
   onSort,
   columnVisibility,
+  onSelectLead,
 }) => {
   const isAllSelected = leads.length > 0 && selectedRowIds.size === leads.length;
 
@@ -191,7 +193,7 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({
               <tr
                 key={lead.id}
                 className={`table-body-row ${isRowHighlighted ? 'row-highlighted' : ''}`}
-                onClick={() => onToggleRow(lead.id)}
+                onClick={() => onSelectLead(lead)}
               >
                 {/* 1. Checkbox */}
                 {columnVisibility.checkbox && (
@@ -216,7 +218,14 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({
                 {columnVisibility.name && (
                   <td className="td-cell td-name">
                     <div className="name-cell-content">
-                      <span className="lead-name-text" title={lead.name}>
+                      <span
+                        className="lead-name-text"
+                        title={lead.name}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectLead(lead);
+                        }}
+                      >
                         {lead.displayName || lead.name}
                       </span>
                       <span className="sample-badge">
@@ -230,10 +239,19 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({
                 {/* 3. Lead Owner */}
                 {columnVisibility.leadOwner && (
                   <td className="td-cell td-lead-owner">
-                    <div className="lead-owner-content">
-                      <UserPlus size={14} strokeWidth={1.6} color="#9CA3AF" />
-                      <span className="unassigned-text">{lead.leadOwner}</span>
-                    </div>
+                    {lead.leadOwner !== 'Unassigned' ? (
+                      <div className="lead-owner-assigned">
+                        <span className="table-owner-avatar">
+                          {lead.leadOwnerInitials || lead.leadOwner.substring(0, 2).toUpperCase()}
+                        </span>
+                        <span className="owner-assigned-name">{lead.leadOwner}</span>
+                      </div>
+                    ) : (
+                      <div className="lead-owner-content">
+                        <UserPlus size={14} strokeWidth={1.6} color="#9CA3AF" />
+                        <span className="unassigned-text">{lead.leadOwner}</span>
+                      </div>
+                    )}
                   </td>
                 )}
 

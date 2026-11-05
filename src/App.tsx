@@ -1,11 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TopNav } from './components/TopNav';
 import { Toolbar } from './components/Toolbar';
 import { LeadsTable } from './components/LeadsTable';
 import { Pagination } from './components/Pagination';
+import { LeadDetailsDrawer } from './components/LeadDetailsDrawer/LeadDetailsDrawer';
 import { INITIAL_LEADS } from './data/mockLeads';
-import type { Lead, SortField, SortOrder, ColumnVisibility } from './types';
+import type { Lead, SortField, SortOrder, ColumnVisibility, StageType, TeamMember } from './types';
 import './App.css';
 
 export function App() {
@@ -17,6 +18,28 @@ export function App() {
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+
+  // Dynamic leads state to allow updating stage and owner
+  const [leadsData, setLeadsData] = useState<Lead[]>(INITIAL_LEADS);
+
+  // Drawer state
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Check URL query parameter for automated verification
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const leadParam = params.get('lead');
+    if (leadParam) {
+      const found = INITIAL_LEADS.find(
+        (l) => l.id === leadParam || l.name.toLowerCase().includes(leadParam.toLowerCase())
+      );
+      if (found) {
+        setSelectedLead(found);
+        setIsDrawerOpen(true);
+      }
+    }
+  }, []);
 
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
     checkbox: true,
@@ -31,7 +54,7 @@ export function App() {
 
   // Filter leads by search query and stage
   const filteredLeads = useMemo(() => {
-    return INITIAL_LEADS.filter((lead) => {
+    return leadsData.filter((lead) => {
       // Stage filter
       if (selectedStageFilter !== 'All' && lead.stage !== selectedStageFilter) {
         return false;
@@ -59,7 +82,7 @@ export function App() {
 
       return true;
     });
-  }, [searchQuery, selectedStageFilter]);
+  }, [leadsData, searchQuery, selectedStageFilter]);
 
   // Sort leads
   const sortedLeads = useMemo(() => {
@@ -90,6 +113,90 @@ export function App() {
   }, [sortedLeads, currentPage, pageSize]);
 
   const totalPages = Math.max(1, Math.ceil(sortedLeads.length / pageSize));
+
+  // Open lead details drawer
+  const openLeadDetails = (lead: Lead) => {
+    setSelectedLead(lead);
+    setIsDrawerOpen(true);
+  };
+
+  // Close drawer
+  const closeLeadDetails = () => {
+    setIsDrawerOpen(false);
+  };
+
+  // Previous and Next lead navigation inside drawer
+  const currentLeadIndex = selectedLead
+    ? sortedLeads.findIndex((l) => l.id === selectedLead.id)
+    : -1;
+
+  const hasPrevLead = currentLeadIndex > 0;
+  const hasNextLead = currentLeadIndex >= 0 && currentLeadIndex < sortedLeads.length - 1;
+
+  const handlePrevLead = () => {
+    if (hasPrevLead) {
+      setSelectedLead(sortedLeads[currentLeadIndex - 1]);
+    }
+  };
+
+  const handleNextLead = () => {
+    if (hasNextLead) {
+      setSelectedLead(sortedLeads[currentLeadIndex + 1]);
+    }
+  };
+
+  // Update lead stage
+  const handleStageChange = (newStage: StageType) => {
+    if (!selectedLead) return;
+
+    const updatedLead: Lead = {
+      ...selectedLead,
+      stage: newStage,
+      activities: [
+        {
+          id: `act-${Date.now()}`,
+          type: 'stage',
+          title: `Stage updated to ${newStage}`,
+          description: `Stage changed manually in lead details.`,
+          timestamp: 'Just now',
+          user: 'Ishu Bhardwaj',
+        },
+        ...(selectedLead.activities || []),
+      ],
+    };
+
+    setSelectedLead(updatedLead);
+    setLeadsData((prev) =>
+      prev.map((l) => (l.id === updatedLead.id ? updatedLead : l))
+    );
+  };
+
+  // Update lead owner
+  const handleOwnerChange = (newOwner: TeamMember) => {
+    if (!selectedLead) return;
+
+    const updatedLead: Lead = {
+      ...selectedLead,
+      leadOwner: newOwner.name,
+      leadOwnerInitials: newOwner.initials,
+      activities: [
+        {
+          id: `act-${Date.now()}`,
+          type: 'note',
+          title: `Lead assigned to ${newOwner.name}`,
+          description: `Ownership transfer completed.`,
+          timestamp: 'Just now',
+          user: 'System',
+        },
+        ...(selectedLead.activities || []),
+      ],
+    };
+
+    setSelectedLead(updatedLead);
+    setLeadsData((prev) =>
+      prev.map((l) => (l.id === updatedLead.id ? updatedLead : l))
+    );
+  };
 
   // Toggle single row selection
   const handleToggleRow = (id: string) => {
@@ -131,6 +238,11 @@ export function App() {
     setSortOrder('desc');
     setSelectedRowIds(new Set());
     setCurrentPage(1);
+    setLeadsData(INITIAL_LEADS);
+    if (selectedLead) {
+      const refreshed = INITIAL_LEADS.find((l) => l.id === selectedLead.id) || null;
+      setSelectedLead(refreshed);
+    }
     setColumnVisibility({
       checkbox: true,
       name: true,
@@ -194,6 +306,7 @@ export function App() {
               sortOrder={sortOrder}
               onSort={handleSort}
               columnVisibility={columnVisibility}
+              onSelectLead={openLeadDetails}
             />
 
             {/* Bottom Pagination */}
@@ -211,6 +324,20 @@ export function App() {
           </div>
         </main>
       </div>
+
+      {/* 3. Lead Details Right-Side Drawer */}
+      <LeadDetailsDrawer
+        isOpen={isDrawerOpen}
+        lead={selectedLead}
+        onClose={closeLeadDetails}
+        onPrevLead={handlePrevLead}
+        onNextLead={handleNextLead}
+        hasPrevLead={hasPrevLead}
+        hasNextLead={hasNextLead}
+        onStageChange={handleStageChange}
+        onOwnerChange={handleOwnerChange}
+        onRefresh={handleRefresh}
+      />
     </div>
   );
 }
